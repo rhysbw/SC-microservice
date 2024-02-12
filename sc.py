@@ -55,7 +55,7 @@ def setup_routes(db_handler):
             else:
                 return '', 204
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return '', 500
 
     @app.route('/cells/<cell_id>', methods=['GET'])
     def read_cell(cell_id):
@@ -68,7 +68,7 @@ def setup_routes(db_handler):
                 return jsonify({"error": "Cell not found"}), 404
             return jsonify({"id": cell_id, "formula": value}), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return '', 500
 
     @app.route('/cells/<cell_id>', methods=['DELETE'])
     def delete_cell(cell_id):
@@ -90,7 +90,7 @@ def setup_routes(db_handler):
             cells = db_handler.list_cells()
             return jsonify(cells), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return '', 500
 
     # Define other routes...
 
