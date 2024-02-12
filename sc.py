@@ -19,6 +19,29 @@ def get_db_handler(database_type):
     #     return FirebaseHandler()
     else:
         raise ValueError("Unsupported database type")
+def evaluate_cell(cell_id, formula, db_handler):
+    """
+    Evaluates a cell's formula and returns the result.
+    """
+    # Check if the formula is a simple number
+    if formula.isdigit():
+        return formula
+
+    # need to use recursion
+    # find all the cell ids in the formula
+    cell_ids = re.findall(r'[A-Z]+\d+', formula)
+    # get the formula for each cell
+    for cell in cell_ids:
+        # get the formula for the cell
+        cell_formula = db_handler.read_cell(cell)
+        # evaluate the formula
+        value = evaluate_cell(cell, cell_formula, db_handler)
+        # replace the cell id with the value
+        formula = formula.replace(cell, value)
+    # evaluate the formula
+    return str(eval(formula))
+
+
 
 
 def setup_routes(db_handler):
@@ -64,9 +87,13 @@ def setup_routes(db_handler):
         """
         try:
             value = db_handler.read_cell(cell_id)
-            if value is None:
+
+            # evaluate the formula
+            if value:
+                value = evaluate_cell(cell_id, value, db_handler)
+                return jsonify({"id": cell_id, "formula": value}), 200
+            else:
                 return jsonify({"error": "Cell not found"}), 404
-            return jsonify({"id": cell_id, "formula": value}), 200
         except Exception as e:
             return '', 500
 
