@@ -28,7 +28,7 @@ def setup_routes(db_handler):
 
     @app.route('/cells/<cell_id>', methods=['PUT'])
     def create_or_update_cell(cell_id):
-        data = request.get_json(force=True)  # force=True to ensure you get JSON even if Content-Type header is missing
+        data = request.get_json()  # force=True to ensure you get JSON even if Content-Type header is missing
 
         # For Test 8: Check if 'id' key is missing in JSON body
         if 'id' not in data:
