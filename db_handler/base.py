@@ -34,11 +34,5 @@ class DatabaseHandler(ABC):
         """
         pass
 
-    @abstractmethod
-    def get_formula_by_id(self, cell_id):
-        """
-        Get formula by cell_id
-        """
-        pass
 
 
