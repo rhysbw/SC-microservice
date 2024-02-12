@@ -50,6 +50,7 @@ def setup_routes(db_handler):
         try:
             # Assuming db_handler.create_cell() exists and handles the DB operation
             was_created = db_handler.create_cell(cell_id, formula)
+            print('this ran')
             return '', 201 if was_created else '', 204
         except Exception as e:
             return jsonify({"error": str(e)}), 500
