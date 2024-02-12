@@ -32,7 +32,7 @@ def setup_routes(db_handler):
 
         # For Test 8: Check if 'id' key is missing in JSON body
         if 'id' not in data:
-            return jsonify({"error": "Missing 'id' in JSON payload"}), 400
+            return '', 400
 
         # Extract 'formula' and 'id' from JSON
         formula = data.get('formula')
@@ -40,17 +40,17 @@ def setup_routes(db_handler):
 
         # Ensure formula is provided
         if not formula:
-            return jsonify({"error": "Formula is required"}), 400
+            return '', 400
 
         # For Test 9: Check if 'id' in URL does not match 'id' in JSON body
         if cell_id != json_id:
-            return jsonify({"error": "Mismatched 'id' between URL and JSON payload"}), 400
+            return '', 400
 
         # Insert or update logic here...
         try:
             # Assuming db_handler.create_cell() exists and handles the DB operation
             was_created = db_handler.create_cell(cell_id, formula)
-            return 201 if was_created else 204
+            return '', 201 if was_created else '', 204
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
