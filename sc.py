@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from db_handler.sqlite_handler import SQLiteHandler
 import operator
 import re
+import os
 from db_handler.firebase_handler import FirebaseHandler  # Uncomment when FirebaseHandler is implemented
 
 app = Flask(__name__)
@@ -16,8 +17,11 @@ def get_db_handler(database_type):
     if database_type == 'sqlite':
         return SQLiteHandler('speadsheet.db')
     elif database_type == 'firebase':
-         url = 'https://sc-microservice-default-rtdb.europe-west1.firebasedatabase.app/'
-         return FirebaseHandler(url)
+        firebase_db_name = os.environ.get('FBASE')
+        if not firebase_db_name:
+            raise ValueError("Firebase database name not found")
+        url = f'https://{firebase_db_name}-default-rtdb.europe-west1.firebasedatabase.app/'
+        return FirebaseHandler(url)
     else:
         raise ValueError("Unsupported database type")
 def evaluate_cell(cell_id, formula, db_handler):
