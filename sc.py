@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from db_handler.sqlite_handler import SQLiteHandler
 import operator
 import re
-# from db_handler.firebase_handler import FirebaseHandler  # Uncomment when FirebaseHandler is implemented
+from db_handler.firebase_handler import FirebaseHandler  # Uncomment when FirebaseHandler is implemented
 
 app = Flask(__name__)
 
@@ -15,8 +15,9 @@ def get_db_handler(database_type):
     """
     if database_type == 'sqlite':
         return SQLiteHandler('speadsheet.db')
-    # elif database_type == 'firebase':
-    #     return FirebaseHandler()
+    elif database_type == 'firebase':
+         url = 'https://sc-microservice-default-rtdb.europe-west1.firebasedatabase.app/'
+         return FirebaseHandler(url)
     else:
         raise ValueError("Unsupported database type")
 def evaluate_cell(cell_id, formula, db_handler):
@@ -51,8 +52,7 @@ def setup_routes(db_handler):
 
     @app.route('/cells/<cell_id>', methods=['PUT'])
     def create_or_update_cell(cell_id):
-        data = request.get_json()  # force=True to ensure you get JSON even if Content-Type header is missing
-
+        data = request.get_json()
         # For Test 8: Check if 'id' key is missing in JSON body
         if 'id' not in data:
             return '', 400
@@ -68,10 +68,7 @@ def setup_routes(db_handler):
         # For Test 9: Check if 'id' in URL does not match 'id' in JSON body
         if cell_id != json_id:
             return '', 400
-
-        # Insert or update logic here...
         try:
-            # Assuming db_handler.create_cell() exists and handles the DB operation
             was_created = db_handler.create_cell(cell_id, formula)
             if was_created:
                 return '', 201
