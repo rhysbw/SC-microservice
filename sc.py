@@ -1,4 +1,6 @@
 import argparse
+from types import NoneType
+
 from flask import Flask, request, jsonify
 from db_handler.sqlite_handler import SQLiteHandler
 import operator
@@ -29,6 +31,7 @@ def evaluate_cell(cell_id, formula, db_handler):
     Evaluates a cell's formula and returns the result.
     """
     # Check if the formula is a simple number
+    print('formula: ', formula)
     if formula.isdigit():
         return formula
 
@@ -38,9 +41,13 @@ def evaluate_cell(cell_id, formula, db_handler):
     # get the formula for each cell
     for cell in cell_ids:
         # get the formula for the cell
+        print('cell: ', cell)
         cell_formula = db_handler.read_cell(cell)
-        # evaluate the formula
-        value = evaluate_cell(cell, cell_formula, db_handler)
+        print(f'cell_formula: {cell_formula},\n cell_id: {cell_id}')
+        if cell_formula is None:
+            value = '0'  # You may handle this differently
+        else:
+            value = evaluate_cell(cell, cell_formula, db_handler)
         # replace the cell id with the value
         formula = formula.replace(cell, value)
     # evaluate the formula
@@ -86,23 +93,28 @@ def setup_routes(db_handler):
         """
         Reads and returns the value of a cell.
         """
-        try:
-            value = db_handler.read_cell(cell_id)
 
-            # evaluate the formula
-            if value:
-                value = evaluate_cell(cell_id, value, db_handler)
-                return jsonify({"id": cell_id, "formula": value}), 200
-            else:
-                return jsonify({"error": "Cell not found"}), 404
-        except Exception as e:
-            return '', 500
+        value = db_handler.read_cell(cell_id)
+
+        # evaluate the formula
+        print('value: ', value)
+        if value is not None:
+            print('value is not none: ', value)
+            value = evaluate_cell(cell_id, value, db_handler)
+            return jsonify({"id": cell_id, "formula": value}), 200
+        else:
+            return jsonify({"id": cell_id, "formula": 0}), 404
+
 
     @app.route('/cells/<cell_id>', methods=['DELETE'])
     def delete_cell(cell_id):
         """
         Deletes a cell by its ID.
         """
+        # Need to check if the cell exists
+        if not db_handler.read_cell(cell_id):
+            return '', 404
+
         try:
             db_handler.delete_cell(cell_id)
             return '', 204
