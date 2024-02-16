@@ -34,7 +34,6 @@ def evaluate_cell(cell_id, formula, db_handler):
     """
     # Check if the formula is a simple number
     # BASE CASE
-    print('formula: ', formula)
     if formula.isdigit():
         return formula
 
