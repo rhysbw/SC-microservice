@@ -8,10 +8,18 @@ class SQLiteHandler(DatabaseHandler):
     """
 
     def __init__(self, db_path):
+        """
+        Initializes the SQLiteHandler with the path to the database file.
+        :param db_path: file path to the SQLite database
+        """
         self.db_path = db_path
         self.connection = self._connect_to_db()
 
     def _connect_to_db(self):
+        """
+        Connects to the SQLite database.
+        :return: the connection object
+        """
         # Check if the database file does not exist and create it
         db_exists = os.path.exists(self.db_path)
         connection = sqlite3.connect(self.db_path)
@@ -32,6 +40,9 @@ class SQLiteHandler(DatabaseHandler):
         """
         Creates a new cell or updates an existing one with the provided formula.
         Returns True if a new cell was created, False if an existing cell was updated.
+        :param cell_id: id of the cell
+        :param formula: formula to be stored
+        :return: True if a new cell was created, False if an existing cell was updated
         """
         was_created = False
         try:
@@ -58,7 +69,9 @@ class SQLiteHandler(DatabaseHandler):
 
     def read_cell(self, cell_id):
         """
-        Reads the value of a cell by its id.
+        Reads the formula of a cell by its id, by executing SQL queries directly.
+        :param cell_id: id of the cell to read
+        :return: the formula of the cell, if it exists else None
         """
         try:
             with self._connect_to_db() as conn:
@@ -72,7 +85,8 @@ class SQLiteHandler(DatabaseHandler):
 
     def delete_cell(self, cell_id):
         """
-        Deletes a cell by its id.
+        Deletes a cell by its id, by executing SQL queries directly.
+        :param cell_id: id of the to delete
         """
         try:
             with self._connect_to_db() as conn:
@@ -85,7 +99,8 @@ class SQLiteHandler(DatabaseHandler):
 
     def list_cells(self):
         """
-        Lists all cell ids in the database.
+        Lists all cell ids in the database, by executing SQL queries directly.
+        :return list of cell ids
         """
         try:
             with self._connect_to_db() as conn:
